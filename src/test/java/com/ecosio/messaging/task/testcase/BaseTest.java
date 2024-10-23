@@ -13,16 +13,29 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
+import java.util.Properties;
 
 @Slf4j
 public abstract class BaseTest {
-    protected final String appUnderTestBaseUrl = "http://localhost:18080/contact/";
+    private Properties properties;
     protected HttpResponseWrapper responseWrapper;
+
+    /**
+     * Loads the configuration from the properties file.
+     */
+    private void loadConfig() {
+        properties = new Properties();
+        try (FileInputStream input = new FileInputStream("src/test/resources/config.properties")) {
+            properties.load(input);
+        } catch (IOException e) {
+            log.error("Error loading config.properties: " + e.getMessage());
+        }
+    }
 
     /**
      * Logs the test step description
@@ -79,7 +92,8 @@ public abstract class BaseTest {
         String encodedFirstname = URLEncoder.encode(firstname, StandardCharsets.UTF_8);
 
         // Construct the HttpGet request with the encoded firstname
-        HttpGet httpGet = new HttpGet(appUnderTestBaseUrl + "firstname/" + encodedFirstname);
+        String url = properties.getProperty("base_url") + properties.getProperty("firstname_endpoint") + encodedFirstname;
+        HttpGet httpGet = new HttpGet(url);
         List<Contact> contactList = null;
         try {
             contactList = connectionHelper(httpGet);
@@ -102,7 +116,8 @@ public abstract class BaseTest {
         String encodedLastname = URLEncoder.encode(lastname, StandardCharsets.UTF_8);
 
         // Construct the HttpGet request with the encoded lastname
-        HttpGet httpGet = new HttpGet(appUnderTestBaseUrl + "lastname/" + encodedLastname);
+        String url = properties.getProperty("base_url") + properties.getProperty("lastname_endpoint") + encodedLastname;
+        HttpGet httpGet = new HttpGet(url);
 
         List<Contact> contactList = null;
         try {
@@ -123,7 +138,8 @@ public abstract class BaseTest {
      */
     protected List<Contact> getAllContacts() throws IOException {
 
-        HttpGet httpGet = new HttpGet(appUnderTestBaseUrl + "allContacts");
+        String url = properties.getProperty("base_url") + properties.getProperty("endpoint_contacts");
+        HttpGet httpGet = new HttpGet(url);
         return connectionHelper(httpGet);
 
     }
@@ -139,7 +155,7 @@ public abstract class BaseTest {
     protected void createContact(Contact newContact) throws IOException {
 
         // Construct the URL for the create request
-        String createUrl = appUnderTestBaseUrl + "createOrUpdateContact/" + newContact.getId();
+        String createUrl = properties.getProperty("base_url") + properties.getProperty("create_update_endpoint") + newContact.getId();
 
         // Create the HttpPost request
         HttpPost httpPost = new HttpPost(createUrl);
@@ -168,7 +184,8 @@ public abstract class BaseTest {
     protected void deleteContact(int contactId) throws IOException {
 
         // Construct the URL for the delete request
-        String deleteUrl = appUnderTestBaseUrl + contactId;
+        String url = properties.getProperty("base_url") + contactId;
+        String deleteUrl = url;
 
         // Create the HttpDelete request
         HttpDelete httpDelete = new HttpDelete(deleteUrl);
@@ -195,7 +212,7 @@ public abstract class BaseTest {
     protected void updateContact(Contact currentContact, Contact updatedContact) throws IOException {
 
         // Construct the URL for the update request
-        String updateUrl = appUnderTestBaseUrl + "createOrUpdateContact/" + currentContact.getId();
+        String updateUrl = properties.getProperty("base_url") + properties.getProperty("create_update_endpoint") + currentContact.getId();
 
         // Create the HttpPost request
         HttpPost httpPost = new HttpPost(updateUrl);
@@ -258,6 +275,7 @@ public abstract class BaseTest {
     }
     @BeforeEach
     void setup() throws IOException {
+        loadConfig();  // Load properties before running tests
         logTestStep("Setup for " + getClass().getSimpleName() + " tests");
         cleanupBeforeAndAfter();
         testPrepration();

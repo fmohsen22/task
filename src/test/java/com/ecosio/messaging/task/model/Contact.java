@@ -41,3 +41,4 @@ public class Contact {
         return Objects.hash(firstname, lastname);
     }
 }
+
