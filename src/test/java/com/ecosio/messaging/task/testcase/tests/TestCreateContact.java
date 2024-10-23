@@ -17,7 +17,7 @@ public class TestCreateContact extends BaseTest {
 
     @Override
     protected void cleanupBeforeAndAfter() throws IOException {
-        logTestStep("Delete contact with the name of 'John' from the Databace.");
+        logTestStep("Delete contact with the name of 'John' from the Database.");
         List<Contact> testContacts = getContactByFirstname("John");
         for (Contact contact : testContacts) {
             deleteContact(contact.getId());
