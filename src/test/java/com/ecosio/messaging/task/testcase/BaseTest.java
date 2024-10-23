@@ -2,27 +2,27 @@ package com.ecosio.messaging.task.testcase;
 
 import com.ecosio.messaging.task.model.Contact;
 import com.ecosio.messaging.task.util.HttpClientHelper;
+import com.ecosio.messaging.task.util.HttpResponseWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
 @Slf4j
-public class BaseTest {
+public abstract class BaseTest {
     protected final String appUnderTestBaseUrl = "http://localhost:18080/contact/";
+    protected HttpResponseWrapper responseWrapper;
 
     /**
      * Logs the test step description
@@ -43,10 +43,19 @@ public class BaseTest {
     }
 
     /**
+     * Logs a general information message.
+     *
+     * @param SuccessMessage A string that contains the Success message after test.
+     */
+    protected void logSuccessfulresault(String infoMessage) {
+        log.info("Test Successful: " + infoMessage);
+    }
+
+    /**
      * Logs the final result of a test
      *
-     * @param testName Name of the test
-     * @param success  Whether the test was successful
+     * @param testName     Name of the test
+     * @param success      Whether the test was successful
      * @param errorMessage An optional error message if the test failed
      */
     protected void logTestResult(String testName, boolean success, String errorMessage) {
@@ -64,12 +73,16 @@ public class BaseTest {
      * @return list of all matching contacts
      * @throws IOException
      */
-    protected List<Contact> getContactByFirstname(String firstname)  {
+    protected List<Contact> getContactByFirstname(String firstname) {
 
-        HttpGet httpGet = new HttpGet(appUnderTestBaseUrl + "firstname/" + firstname);
-        List<Contact> contactList=null;
+        // Encode the firstname to ensure it's safe for use in URLs
+        String encodedFirstname = URLEncoder.encode(firstname, StandardCharsets.UTF_8);
+
+        // Construct the HttpGet request with the encoded firstname
+        HttpGet httpGet = new HttpGet(appUnderTestBaseUrl + "firstname/" + encodedFirstname);
+        List<Contact> contactList = null;
         try {
-            contactList= connectionHelper(httpGet);
+            contactList = connectionHelper(httpGet);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -85,9 +98,21 @@ public class BaseTest {
      */
     protected List<Contact> getContactByLastname(String lastname) throws IOException {
 
-        HttpGet httpGet = new HttpGet(appUnderTestBaseUrl + "lastname/" + lastname);
-        return connectionHelper(httpGet);
+        // Encode the lastname to ensure it's safe for use in URLs
+        String encodedLastname = URLEncoder.encode(lastname, StandardCharsets.UTF_8);
+
+        // Construct the HttpGet request with the encoded lastname
+        HttpGet httpGet = new HttpGet(appUnderTestBaseUrl + "lastname/" + encodedLastname);
+
+        List<Contact> contactList = null;
+        try {
+            contactList = connectionHelper(httpGet);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        return contactList;
     }
+
 
 
     /**
@@ -149,7 +174,12 @@ public class BaseTest {
         HttpDelete httpDelete = new HttpDelete(deleteUrl);
 
         // Use the existing connectionHelper to execute the delete request
-        connectionHelper(httpDelete);
+        try {
+
+            connectionHelper(httpDelete);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
     }
 
 
@@ -182,7 +212,11 @@ public class BaseTest {
         httpPost.setHeader("Content-Type", "application/json");
 
         // Use the existing connectionHelper to execute the request
-        connectionHelper(httpPost);
+        try {
+            connectionHelper(httpPost);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
     }
 
 
@@ -193,43 +227,54 @@ public class BaseTest {
      * @return list of contacts based on the request
      * @throws IOException
      */
+    // Connection helper method with status code and response logging
     private List<Contact> connectionHelper(HttpRequestBase httpRequestBase) throws IOException {
-
         try (CloseableHttpClient httpClient = HttpClientHelper.getHttpClientAcceptsAllSslCerts()) {
-            try {
+            try (CloseableHttpResponse response = httpClient.execute(httpRequestBase)) {
 
-                ObjectMapper mapper = new ObjectMapper();
-                String response = IOUtils.toString(
-                        httpClient.execute(httpRequestBase)
-                                .getEntity()
-                                .getContent(),
-                        StandardCharsets.UTF_8
-                );
+                int statusCode = response.getStatusLine().getStatusCode();
+                String responseContent = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
 
-                // Check if the response is an array or a single object
-                if (response.trim().startsWith("[")) {
-                    // Deserialize as a list if it's an array
-                    return mapper.readValue(response, new TypeReference<List<Contact>>() {
-                    });
-                } else {
-                    // Deserialize as a single object and wrap it in a list
-                    Contact contact = mapper.readValue(response, Contact.class);
-                    return List.of(contact);
+                // Store the response in the wrapper
+                responseWrapper = new HttpResponseWrapper(statusCode, responseContent);
+
+
+                if (statusCode != 200) {
+                    log.error("HTTP request failed with status code: " + statusCode + " and message: " + responseContent);
                 }
 
+                // Check if the response is an array or a single object
+                ObjectMapper mapper = new ObjectMapper();
+                if (responseContent.trim().startsWith("[")) {
+                    return mapper.readValue(responseContent, new TypeReference<List<Contact>>() {});
+                } else {
+                    Contact contact = mapper.readValue(responseContent, Contact.class);
+                    return List.of(contact);
+                }
             } finally {
                 httpRequestBase.releaseConnection();
             }
         }
     }
-
     @BeforeEach
     void setup() throws IOException {
-        logTestStep("Setup for "+getClass().getSimpleName()+" tests");
+        logTestStep("Setup for " + getClass().getSimpleName() + " tests");
+        cleanupBeforeAndAfter();
+        testPrepration();
     }
+
     @AfterEach
     void cleanup() throws IOException {
-        logTestStep("Cleanup for "+getClass().getSimpleName()+" tests");
+        logTestStep("Cleanup for " + getClass().getSimpleName() + " tests");
+        cleanupBeforeAndAfter();
+        cleanupAfter();
     }
+
+    protected void cleanupBeforeAndAfter() throws IOException {}
+
+    protected void testPrepration() throws IOException{}
+
+    protected void cleanupAfter() throws IOException{}
+
 
 }

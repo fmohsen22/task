@@ -16,9 +16,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 public class TestDeleteContact extends BaseTest {
 
-    @BeforeEach
-    void setup() throws IOException {
-        logTestStep("Setup for deleteContact tests");
+    @Override
+    protected void cleanupBeforeAndAfter() throws IOException {
+        logTestStep("Delete contact with the name of 'John' from the Databace.");
+        List<Contact> testContacts = getContactByFirstname("John");
+        for (Contact contact : testContacts) {
+            deleteContact(contact.getId());
+        }
+    }
+    @Override
+    protected void testPrepration() throws IOException {
+        logTestStep("create 'John' in contacts list");
         // Create a contact to delete later
         Contact newContact = new Contact(3, "John", "Doe");
         createContact(newContact);
@@ -32,7 +40,7 @@ public class TestDeleteContact extends BaseTest {
         assertThat(contacts.size()).isOne();
 
         // Delete the contact
-        logTestStep("Delete the contact");
+        logTestStep("Delete 'John from contacts");
         Contact contactToDelete = contacts.get(0);
         deleteContact(contactToDelete.getId());
 
@@ -40,5 +48,17 @@ public class TestDeleteContact extends BaseTest {
         logTestStep("Verify that the contact was deleted");
         List<Contact> remainingContacts = getContactByFirstname("John");
         assertThat(remainingContacts.size()).isZero();
+    }
+
+    @Test
+    void deleteUnavailableId() throws IOException {
+        // Delete the contact
+        logTestStep("Delete  contacts, but with the unavailable ID of 100!");
+        deleteContact(100);
+
+        // as input is required then the response status should be 405
+        assertThat(responseWrapper.getStatusCode()).isEqualTo(404);
+        assertThat(responseWrapper.getContent()).contains("Contact with requested ID doesn't exist");
+        logSuccessfulresault("Correctly shows the error msg '404'.");
     }
 }

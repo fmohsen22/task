@@ -4,8 +4,6 @@ package com.ecosio.messaging.task.testcase.tests;
 import com.ecosio.messaging.task.model.Contact;
 import com.ecosio.messaging.task.testcase.BaseTest;
 import groovy.util.logging.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -17,9 +15,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestCreateContact extends BaseTest {
 
 
-    @AfterEach
-    void cleanup() throws IOException {
-        logTestStep("Cleanup for createContact tests");
+    @Override
+    protected void cleanupBeforeAndAfter() throws IOException {
+        logTestStep("Delete contact with the name of 'John' from the Databace.");
         List<Contact> testContacts = getContactByFirstname("John");
         for (Contact contact : testContacts) {
             deleteContact(contact.getId());
