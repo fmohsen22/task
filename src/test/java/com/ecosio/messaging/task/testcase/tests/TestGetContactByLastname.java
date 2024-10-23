@@ -3,9 +3,6 @@ package com.ecosio.messaging.task.testcase.tests;
 import com.ecosio.messaging.task.model.Contact;
 import com.ecosio.messaging.task.testcase.BaseTest;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Fail;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -51,6 +48,7 @@ public class TestGetContactByLastname extends BaseTest {
 
         logInfo("No contacts found with lastname '" + notExistingLastname + "'");
     }
+
     @Test
     void testMultipleMatchesByLastname() throws IOException {
         logTestStep("Fetching contacts with substring 'name' in lastname");

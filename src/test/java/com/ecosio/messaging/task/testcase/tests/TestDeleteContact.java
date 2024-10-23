@@ -4,8 +4,6 @@ package com.ecosio.messaging.task.testcase.tests;
 import com.ecosio.messaging.task.model.Contact;
 import com.ecosio.messaging.task.testcase.BaseTest;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -24,6 +22,7 @@ public class TestDeleteContact extends BaseTest {
             deleteContact(contact.getId());
         }
     }
+
     @Override
     protected void testPrepration() throws IOException {
         logTestStep("create 'John' in contacts list");

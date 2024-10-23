@@ -3,8 +3,6 @@ package com.ecosio.messaging.task.testcase.tests;
 import com.ecosio.messaging.task.model.Contact;
 import com.ecosio.messaging.task.testcase.BaseTest;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -24,10 +22,10 @@ public class TestUpdateContact extends BaseTest {
     }
 
     @Override
-    protected void cleanupAfter(){
+    protected void cleanupAfter() {
         try {
             deleteContact(11);
-        }catch (Exception e){
+        } catch (Exception e) {
             logInfo(e.toString());
         }
     }
@@ -100,15 +98,15 @@ public class TestUpdateContact extends BaseTest {
     @Test
     void testUpdateUnavailableId() throws IOException {
         //make an available contact with unavailable ID
-        Contact unavailableContact =new Contact(11, "Testa", "Testb");
-        logTestStep("Step 1: Create a Contact object with unavailable ID = "+unavailableContact.toString());
+        Contact unavailableContact = new Contact(11, "Testa", "Testb");
+        logTestStep("Step 1: Create a Contact object with unavailable ID = " + unavailableContact);
 
         //make an update
-        Contact updatedUnavailableContact =new Contact(11, "abc", "def");
-        logTestStep("Step 2: update the Contact object with unavailable ID = "+updatedUnavailableContact.toString());
+        Contact updatedUnavailableContact = new Contact(11, "abc", "def");
+        logTestStep("Step 2: update the Contact object with unavailable ID = " + updatedUnavailableContact);
 
         //update
-        logTestStep("Update the Contact"+ unavailableContact + " to "+updatedUnavailableContact);
+        logTestStep("Update the Contact" + unavailableContact + " to " + updatedUnavailableContact);
         updateContact(unavailableContact, updatedUnavailableContact);
 
         // Verify update
@@ -123,11 +121,12 @@ public class TestUpdateContact extends BaseTest {
         assertThat(contactAfterUpdate.getFirstname()).as("firstname should be updated").isEqualTo("abc");
         assertThat(contactAfterUpdate.getLastname()).as("lastname should be updated").isEqualTo("def");
 
-        logSuccessfulresault("The contact "+unavailableContact + "updated to "+updatedUnavailableContact);
+        logSuccessfulresault("The contact " + unavailableContact + "updated to " + updatedUnavailableContact);
 
         // TODO: 23.10.2024 right now the method is the same for update and create so we can even updte unavailabe ID!
         //  but in future if we separate it to two methods this test will have meaning
     }
+
     //update correct ID to an unavailable ID -> the id in the URl would be different from json
     @Test
     void testUpdateCorrectIDWithUnavailableID() throws IOException {

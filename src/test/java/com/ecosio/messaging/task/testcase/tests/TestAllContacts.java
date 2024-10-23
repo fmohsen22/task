@@ -4,8 +4,6 @@ package com.ecosio.messaging.task.testcase.tests;
 import com.ecosio.messaging.task.model.Contact;
 import com.ecosio.messaging.task.testcase.BaseTest;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,10 +20,10 @@ public class TestAllContacts extends BaseTest {
     protected void cleanupBeforeAndAfter() throws IOException {
         logTestStep("Delete contact with the name of 'John' from the Databace.");
         List<Contact> testContacts = new ArrayList<>();
-        if (getContactByFirstname("Charlie").size()>0) {
+        if (getContactByFirstname("Charlie").size() > 0) {
             testContacts.add(getContactByFirstname("Charlie").get(0));
         }
-        if (getContactByFirstname("Alice").size()>0) {
+        if (getContactByFirstname("Alice").size() > 0) {
             testContacts.add(getContactByFirstname("Alice").get(0));
         }
 

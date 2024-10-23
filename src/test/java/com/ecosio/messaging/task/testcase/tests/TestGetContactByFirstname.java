@@ -3,9 +3,6 @@ package com.ecosio.messaging.task.testcase.tests;
 import com.ecosio.messaging.task.model.Contact;
 import com.ecosio.messaging.task.testcase.BaseTest;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -24,7 +21,6 @@ public class TestGetContactByFirstname extends BaseTest {
         createContact(new Contact(1, "Testa", "Testb"));
         createContact(new Contact(2, "name", "name"));
     }
-
 
 
     @Test
@@ -85,17 +81,19 @@ public class TestGetContactByFirstname extends BaseTest {
         logSuccessfulresault("The firstname input is not Case sensitive.");
 
     }
+
     @Test
     void testEmptyString() throws IOException {
         logTestStep("Search with the Empty String as FirstName");
         // Search with an empty string
-        List<Contact>  contacts = getContactByFirstname("");
+        List<Contact> contacts = getContactByFirstname("");
 
         // as input is required then the response status should be 405
         assertThat(responseWrapper.getStatusCode()).isEqualTo(405);
         assertThat(responseWrapper.getContent()).contains("Method Not Allowed");
         logSuccessfulresault("The empty input as first name is not allowed.");
     }
+
     @Test
     void testWhiteSpace() throws IOException {
         logTestStep("Search with the WithSpace as String as FirstName");
