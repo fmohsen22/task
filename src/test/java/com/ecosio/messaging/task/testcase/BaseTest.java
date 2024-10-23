@@ -45,7 +45,7 @@ public abstract class BaseTest {
     /**
      * Logs a general information message.
      *
-     * @param SuccessMessage A string that contains the Success message after test.
+     * @param  infoMessage string  contains the Success message after test.
      */
     protected void logSuccessfulresault(String infoMessage) {
         log.info("Test Successful: " + infoMessage);
