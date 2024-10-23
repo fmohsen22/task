@@ -22,8 +22,8 @@ import java.util.Properties;
 
 @Slf4j
 public abstract class BaseTest {
-    private Properties properties;
     protected HttpResponseWrapper responseWrapper;
+    private Properties properties;
 
     /**
      * Loads the configuration from the properties file.
@@ -58,7 +58,7 @@ public abstract class BaseTest {
     /**
      * Logs a general information message.
      *
-     * @param  infoMessage string  contains the Success message after test.
+     * @param infoMessage string  contains the Success message after test.
      */
     protected void logSuccessfulresault(String infoMessage) {
         log.info("Test Successful: " + infoMessage);
@@ -129,7 +129,6 @@ public abstract class BaseTest {
     }
 
 
-
     /**
      * gets a list of all contacts stored of the app
      *
@@ -194,7 +193,7 @@ public abstract class BaseTest {
         try {
 
             connectionHelper(httpDelete);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
@@ -231,7 +230,7 @@ public abstract class BaseTest {
         // Use the existing connectionHelper to execute the request
         try {
             connectionHelper(httpPost);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }
@@ -263,7 +262,8 @@ public abstract class BaseTest {
                 // Check if the response is an array or a single object
                 ObjectMapper mapper = new ObjectMapper();
                 if (responseContent.trim().startsWith("[")) {
-                    return mapper.readValue(responseContent, new TypeReference<List<Contact>>() {});
+                    return mapper.readValue(responseContent, new TypeReference<List<Contact>>() {
+                    });
                 } else {
                     Contact contact = mapper.readValue(responseContent, Contact.class);
                     return List.of(contact);
@@ -273,6 +273,7 @@ public abstract class BaseTest {
             }
         }
     }
+
     @BeforeEach
     void setup() throws IOException {
         loadConfig();  // Load properties before running tests
@@ -288,11 +289,14 @@ public abstract class BaseTest {
         cleanupAfter();
     }
 
-    protected void cleanupBeforeAndAfter() throws IOException {}
+    protected void cleanupBeforeAndAfter() throws IOException {
+    }
 
-    protected void testPrepration() throws IOException{}
+    protected void testPrepration() throws IOException {
+    }
 
-    protected void cleanupAfter() throws IOException{}
+    protected void cleanupAfter() throws IOException {
+    }
 
 
 }

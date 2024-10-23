@@ -22,7 +22,6 @@ public class TestGetContactByFirstname extends BaseTest {
         createContact(new Contact(2, "name", "name"));
     }
 
-
     @Test
     void testMultipleMatchesByFirstname() throws IOException {
         logTestStep("Fetching contacts with substring 'name' in firstname");
@@ -121,6 +120,7 @@ public class TestGetContactByFirstname extends BaseTest {
 
         logSuccessfulresault("No contacts found with numeric string as firstname.");
     }
+
     @Test
     void testLongStringAsFirstname() throws IOException {
         logTestStep("Search with a long string as Firstname");
@@ -140,6 +140,4 @@ public class TestGetContactByFirstname extends BaseTest {
         assertThat(contacts.size()).as("no contacts should be returned for special characters in firstname").isZero();
         logSuccessfulresault("No contacts found with special characters as firstname.");
     }
-
-
 }
