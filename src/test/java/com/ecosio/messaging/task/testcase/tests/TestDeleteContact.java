@@ -60,4 +60,5 @@ public class TestDeleteContact extends BaseTest {
         assertThat(responseWrapper.getContent()).contains("Contact with requested ID doesn't exist");
         logSuccessfulresault("Correctly shows the error msg '404'.");
     }
+
 }

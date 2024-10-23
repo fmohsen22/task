@@ -39,5 +39,6 @@ public class TestCreateContact extends BaseTest {
         assertThat(createdContact.getFirstname()).isEqualTo("John");
         assertThat(createdContact.getLastname()).isEqualTo("Doe");
     }
+
 }
 

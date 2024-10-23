@@ -121,4 +121,25 @@ public class TestGetContactByFirstname extends BaseTest {
 
         logSuccessfulresault("No contacts found with numeric string as firstname.");
     }
+    @Test
+    void testLongStringAsFirstname() throws IOException {
+        logTestStep("Search with a long string as Firstname");
+        String longFirstname = "A".repeat(1000);  // Very long string
+        List<Contact> contacts = getContactByFirstname(longFirstname);
+
+        assertThat(contacts.size()).as("no contacts should be returned for long string in firstname").isZero();
+        logSuccessfulresault("No contacts found with long string as firstname.");
+    }
+
+    @Test
+    void testSpecialCharactersInFirstname() throws IOException {
+        logTestStep("Search with special characters as Firstname");
+        String specialChars = "@#!%";
+        List<Contact> contacts = getContactByFirstname(specialChars);
+
+        assertThat(contacts.size()).as("no contacts should be returned for special characters in firstname").isZero();
+        logSuccessfulresault("No contacts found with special characters as firstname.");
+    }
+
+
 }
